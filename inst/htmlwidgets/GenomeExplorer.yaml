@@ -1,0 +1,14 @@
+# (uncomment to add a dependency)
+dependencies:
+ - name: polyfills
+   version: 0.1
+   src: htmlwidgets/lib/polyfills
+   script: polyfills.js
+ - name: es6-promise-polyfill
+   version: 1.2.0
+   src: htmlwidgets/lib/es6-promise-polyfill
+   script: promise.js
+ - name: css
+   version: 0.0
+   src: htmlwidgets
+   stylesheet: GenomeExplorer.css

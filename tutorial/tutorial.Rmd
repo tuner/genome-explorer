@@ -1,0 +1,127 @@
+---
+title: "A Tutorial to Genome Explorer in R"
+author: "Kari Lavikka"
+date: "Mar 16, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is a short tutorial to Genome Explorer, a JavaScipt library and R package for visualizing genomic coordinates. It is most conveniently used with RStudio and/or Shiny, but it also works with vanilla R.
+
+## Installation
+
+The package is available in Anduril R repository. Installation is easy:
+
+```{r eval=FALSE}
+install.packages("GenomeExplorer", repos = "http://anduril.org/pub/R")
+```
+
+## Our first visualization
+
+Let's first import the library. We also use magrittr to conveniently add features to Genome Explorer by using the pipe **%>%** operator.
+
+```{r}
+library(GenomeExplorer)
+library(magrittr)
+```
+
+Here is an example with the minimum amount of data and no extra options of any kind. The data contains a single genomic region, which we visualize using the default *simple* visualization. Genome Explorer comes bundled with chromosome data (cytobands) for a few common genome assemblies. Here we use *hg38*.
+
+By default, Genome Explorer expects to find chromosome, start coordinate, and end coordinate from _chrom_, _start_, and _end_ columns, respectively.
+
+```{r}
+data <- data.frame(
+  chrom = c("chr5"),
+  start = c(50000000),
+  end = c(150000000)
+)
+
+GenomeExplorer("hg38") %>%
+  segmentTrack(data)
+```
+
+## A more advanced example
+
+```{r echo = FALSE, message = FALSE}
+data <- read.table("example_data.txt", header = TRUE, sep = "\t")
+```
+
+Our data now contais two new columns: _patient_ and _type_.
+
+```{r echo = FALSE}
+data
+```
+
+Genome Explorer can display several tracks concurrently, and each track may have a different dataset and visualization type. We will stick with just one track for now.
+
+As we would like to compare the patients with one another, we use the _patient_ column as a discriminator. Each patient then gets an own subtrack. _Type_ is just an arbitrary column that we want to use for coloring the bars produced by the _simple_ visualization.
+
+```{r}
+GenomeExplorer("hg38") %>%
+  segmentTrack(
+    data,
+    discriminator = "patient",
+    vis = "simple",
+    vis_config = list(
+      color = "type"
+    )
+  )
+```
+
+## A complete example
+
+```{r echo = FALSE, message = FALSE}
+data <- read.table("example_cnv.tsv", header = TRUE, sep = "\t")
+```
+
+We finally move on to a real use case. Our data now contains genomic ranges with CNV (Copy number variation) and BAF (B Allele Frequency) values. Here's a sample of the dataset:
+
+```{r echo = FALSE}
+data[1:8, ]
+```
+
+The columns that define the genomic coordinates are now named differently. Fortunately, you do not need to rename the columns - just define them explicitly by attributes _chrom_, _start_, and _end_.
+
+Because we would like to compare the diagnosis (D) and relapse (R) samples side by side, we explicitly enumerate the cases in a specific order. By default, they are ordered alphanumerically.
+
+Genome Explorer provides you with a particular visualization (_cnvAndBaf_) for CNV and BAF data. CNV, which is expressed as *segment mean*, is displayed as a color, ranging from blue (negative, deletion) to red (positive, amplification) through white (zero, no change). BAF is actually displayed as LOH (Loss of Heterozygosity), which is calculated using the formula: |*baf* - 0.5| * 2. The height of the bar is determined by LOH, 0% means full heterozygosity, 100% mean total loss of the B allele.
+
+We also define a title for the data track. Looks prettier that way.
+
+As a final touch we include a gene annotation track, which gives our data some context. The genes and transcripts become visible when you zoom in enough.
+
+```{r}
+GenomeExplorer("hg38") %>%
+  segmentTrack(
+    data,
+    
+    # Define the columns for genomic coordinates
+    chrom = "Chr",
+    start = "Start",
+    end = "End",
+    
+    discriminator = "case",
+    
+    samples = c("D1", "R1",
+                "D2", "R2"),
+    
+    vis = "cnvAndBaf",
+    vis_config = list(
+      # Define the columns. Defining both of them is not mandatory.
+      cnv = "segMean",
+      baf = "bafMean"
+    ),
+    
+    title = "CNV & LOH"
+  ) %>%
+  refseqGeneTrack()
+```
+
+## Best practices
+
+TODO

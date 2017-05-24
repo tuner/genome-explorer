@@ -1,0 +1,13 @@
+Package: GenomeExplorer
+Title: Displays genomic regions on linear tracks
+Version: 0.0.9
+Authors@R: person("Kari", "Lavikka", email = "kari.lavikka@helsinki.fi", role = c("aut", "cre"))
+Description: Displays genomic regions on linear tracks
+Depends: R (>= 3.3.1)
+Imports:
+    magrittr,
+    htmlwidgets
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

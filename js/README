@@ -1,0 +1,8 @@
+
+Compilation of javascript sources requires Rollup.
+
+1. Install node.js https://nodejs.org/en/
+2. $ npm init
+3. $ rollup -c
+
+Rollup creates a bundled javascript file and places it in inst/extdata/htmlwidgets/GenomeExplorer.js

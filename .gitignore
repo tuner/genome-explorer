@@ -1,0 +1,11 @@
+**/.Rproj.user
+**/.Rhistory
+**/.RData
+**/*.map
+**/*.swp
+**/*.swo
+**/*~
+**/.DS_Store
+.vscode/
+tutorial/*.html
+js/node_modules/

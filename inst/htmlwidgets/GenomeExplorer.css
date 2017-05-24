@@ -1,0 +1,176 @@
+.genome-explorer {
+	position: relative;
+	font-family: Sans-serif;
+	font-size: 14px;
+}
+
+.chart {
+	margin-top: 10px;
+}
+
+.chart > g {
+	pointer-events: none;
+}
+
+.chart text {
+	font: 10px sans-serif;
+	/* text-anchor: end; */
+}
+
+.chart .bars rect {
+}
+
+.ge-track {
+	pointer-events: all;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+.grid line {
+	fill: none;
+	stroke: #e8e8e8;
+	shape-rendering: crispEdges;
+}
+
+.grid text {
+	visibility: invisible;
+}
+
+.grid path {
+	stroke: rgba(0, 0, 0, 0);
+}
+
+
+.axis.x text {
+	text-anchor: start;
+}
+
+.grid.x line {
+	stroke-dasharray: 3, 3;
+}
+
+.navigation-bar {
+	margin-top: 10px;
+}
+
+.navigation-bar label {
+	margin-right: 10px;
+}
+
+.visible-domain {
+	width: 20em;
+	display: inline-block;
+	padding: 3px;
+	border: 1px solid #e0e0e0;
+	margin-right: 5px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.range-search-wrapper {
+	position: relative;
+}
+
+.range-search-help {
+	position: absolute;
+	top: 30px;
+	left: 0px;
+	width: 400px;
+
+	border: 1px solid #e0e0e0;
+	padding: 10px;
+	font-size: 12px;
+	background: white;
+}
+
+.range-selector {
+	shape-rendering: crispEdges;
+	stroke: rgba(0, 0, 0, 0.4);
+	fill: rgba(255, 0, 0, 0.05);
+}
+
+.zoom-hint {
+	margin-left: 1em;
+	font-size: 85%;
+}
+
+.peeker-wrapper {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+
+	font-size: 0.9em;
+	line-height: 0.9em;
+	background-color: rgba(255, 255, 255, 0.95);
+	border: 1px solid #e0e0e0;
+	box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.15);
+
+	z-index: 1000;
+	padding: 10px;
+	max-width: 500px;
+	overflow: hidden;
+}
+
+.peeker-wrapper.right {
+	left: auto;
+	right: 10px;
+}
+
+table.peeker td {
+	margin: 0;
+	padding: 2px 5px;
+}
+
+
+.legends {
+	margin-top: 10px;
+}
+
+.legend {
+	border: 1px solid #e0e0e0;
+	display: inline-block;
+	padding: 5px;
+	font-size: 11px;
+	margin-right: 10px;
+}
+
+.legend-item {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.legend-color {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+}
+
+.legend-label {
+	margin-left: 5px;
+}
+
+
+.brush-info {
+	margin-bottom: 20px;
+}
+
+.brush-info h2 {
+	font-size: 16px;
+}
+
+/*
+.bars .bar:hover > rect:first-child {
+	stroke: red;
+	stroke-width: 0.1;
+}
+*/
+
+.bars, .bars .bar .bars .bar rect {
+	/** Required because even an invisible stroke messes up hovering on Chrome */
+	stroke-width: 0;
+}
