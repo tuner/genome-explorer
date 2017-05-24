@@ -127,7 +127,7 @@ segmentTrack <- function(ge, data, discriminator = NULL,
 #'   The server must allow cross origin requests by including the following HTTP header in responses:
 #'   \code{Access-Control-Allow-Origin: *}
 #'   
-#'   If the URL is omitted, the genome data will be loaded from the Hautaniemi Lab's server.
+#'   If the URL is omitted, the genome data will be loaded from karilavikka.fi.
 #'   
 #' @export
 refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
@@ -137,7 +137,7 @@ refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
     url <- refseq_genes_compressed
     
   } else if (is.character(ge$x$genome)) {
-    url = paste0("http://csbi.ltdk.helsinki.fi/pub/projects/genome-explorer/data/annotations/refSeq_genes.", ge$x$genome, ".compressed.txt")
+    url = paste0("https://karilavikka.fi/genome-explorer/annotations/refSeq_genes.", ge$x$genome, ".compressed.txt")
     
   } else {
     stop("No genome assembly nor a URL to annotation data has been provided!")

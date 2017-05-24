@@ -21,6 +21,12 @@ The package is available in Anduril R repository. Installation is easy:
 install.packages("GenomeExplorer", repos = "http://anduril.org/pub/R")
 ```
 
+Or if you want to live on the bleeding edge:
+
+```{r eval=FALSE}
+devtools::install_github("tuner/genome-explorer")
+```
+
 ## Our first visualization
 
 Let's first import the library. We also use magrittr to conveniently add features to Genome Explorer by using the pipe **%>%** operator.

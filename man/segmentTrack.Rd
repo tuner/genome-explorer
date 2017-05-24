@@ -35,10 +35,15 @@ for the samples.}
 
 \item{title}{Title of the track.}
 
-\item{subtrack_size}{Thickness of the subtracks in pixels.}
+\item{subtrack_size}{Subtrack thickness (height) in pixels.}
 
 \item{subtrack_padding}{Padding between the subtracks in proportion to thickness.}
 }
 \description{
-Adds a segment track to Genome Explorer
+A segment is a region in a chromosome. It has start and end coordinates, which are
+indexed in a UCSC style 1-indexed closed ranges.
+}
+\details{
+A segment track uses a user-defined method for visualizing arbitrary columns
+in the data. Currently supported methods are \code{simple} and \code{cnvAndBaf}.
 }

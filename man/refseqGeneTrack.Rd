@@ -12,7 +12,7 @@ refseqGeneTrack(ge, refseq_genes_compressed = NULL)
   The server must allow cross origin requests by including the following HTTP header in responses:
   \code{Access-Control-Allow-Origin: *}
   
-  If the URL is omitted, the genome data will be loaded from the Hautaniemi Lab's server.}
+  If the URL is omitted, the genome data will be loaded from karilavikka.fi.}
 }
 \description{
 Adds a refseq gene annotation track to Genome Explorer
