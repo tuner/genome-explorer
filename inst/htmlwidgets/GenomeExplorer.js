@@ -6919,7 +6919,7 @@ colors("393b795254a36b6ecf9c9ede6379398ca252b5cf6bcedb9c8c6d31bd9e39e7ba52e7cb94
 
 colors("3182bd6baed69ecae1c6dbefe6550dfd8d3cfdae6bfdd0a231a35474c476a1d99bc7e9c0756bb19e9ac8bcbddcdadaeb636363969696bdbdbdd9d9d9");
 
-colors("1f77b4aec7e8ff7f0effbb782ca02c98df8ad62728ff98969467bdc5b0d58c564bc49c94e377c2f7b6d27f7f7fc7c7c7bcbd22dbdb8d17becf9edae5");
+var category20 = colors("1f77b4aec7e8ff7f0effbb782ca02c98df8ad62728ff98969467bdc5b0d58c564bc49c94e377c2f7b6d27f7f7fc7c7c7bcbd22dbdb8d17becf9edae5");
 
 cubehelixLong(cubehelix(300, 0.5, 0.0), cubehelix(-240, 0.5, 1.0));
 
@@ -9060,12 +9060,16 @@ function simple(config) {
 			});
 
 			if (typeof first == "number") {
-				// Assume a continuous variable
-				domain = data.map(function (d) {
-					return d.data[config.color];
-				}).reduce(function (acc, val) {
-					return [Math.min(acc[0], val), Math.max(acc[1], val)];
-				}, [Infinity, -Infinity]);
+				if (Array.isArray(config.domain) && config.domain.length == 2) {
+					domain = config.domain;
+				} else {
+					// Assume a continuous variable
+					domain = data.map(function (d) {
+						return d.data[config.color];
+					}).reduce(function (acc, val) {
+						return [Math.min(acc[0], val), Math.max(acc[1], val)];
+					}, [Infinity, -Infinity]);
+				}
 
 				if (domain[0] < 0 && 0 < domain[1]) {
 					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#1144AA", "#F0F0F0", "#F60018"]);
@@ -9074,10 +9078,15 @@ function simple(config) {
 				}
 			} else {
 				// Assume a nominal categorial variable
-				factors = map$1(data, function (d) {
-					return d.data[config.color];
-				}).keys();
-				colorScale = ordinal(category10);
+				if (Array.isArray(config.domain)) {
+					factors = config.domain;
+				} else {
+					factors = map$1(data, function (d) {
+						return d.data[config.color];
+					}).keys();
+				}
+
+				colorScale = ordinal(factors.length <= 10 ? category10 : category20);
 			}
 		}
 	};
@@ -9282,6 +9291,8 @@ HTMLWidgets.widget({
 						});
 					}
 
+					// Assume just segmentTracks.
+					// TODO: Add support for other kinds of data tracks later
 					tracks.push(segmentTrack(cm, d3data, visualizations[t.vis](t.vis_config), {
 						title: t.title,
 						peeker: tp,

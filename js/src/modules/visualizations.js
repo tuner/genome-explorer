@@ -175,10 +175,15 @@ export function simple(config) {
 			let first = data.map(d => d.data[config.color]).find(d => d);
 
 			if (typeof first == "number") {
+				if (Array.isArray(config.domain) && config.domain.length == 2) {
+					domain = config.domain;
+
+				} else {
 				// Assume a continuous variable
-				domain = data.map(d => d.data[config.color])
-					.reduce((acc, val) => [Math.min(acc[0], val), Math.max(acc[1], val)],
-					[Infinity, -Infinity]);
+					domain = data.map(d => d.data[config.color])
+						.reduce((acc, val) => [Math.min(acc[0], val), Math.max(acc[1], val)],
+						[Infinity, -Infinity]);
+				}
 
 				if (domain[0] < 0 && 0 < domain[1]) {
 					colorScale = d3.scaleLinear()
@@ -192,8 +197,13 @@ export function simple(config) {
 
 			} else {
 				// Assume a nominal categorial variable
-				factors = d3.map(data, d => d.data[config.color]).keys();
-				colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+				if (Array.isArray(config.domain)) {
+					factors = config.domain;
+				} else {
+					factors = d3.map(data, d => d.data[config.color]).keys();
+				}
+
+				colorScale = d3.scaleOrdinal(factors.length <= 10 ? d3.schemeCategory10 : d3.schemeCategory20);
 			}
 		}
 	}
