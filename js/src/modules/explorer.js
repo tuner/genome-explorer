@@ -75,13 +75,14 @@ function explorer(container, cm, tracks, { transform = null }) {
 				brushInfo.append("h2").text("Selection:");
 				const selectionInfo = brushInfo.append("p");
 
+
 				selectionInfo.append("span")
 					.text(domainToString(brushDomain.map(d => cm.chromLoc(d)))
 					+ ` (${domainLength} bp)`);
 
 				selectionInfo.append("button")
 					.text("Zoom to selection")
-					.on("click", () => zoomToDomain(brushDomain, clearBrush));
+					.on("click", () => zoomToDomain(brushDomain, { onEnd: clearBrush }));
 
 				selectionInfo.append("button")
 					.text("Clear selection")
@@ -325,7 +326,7 @@ function explorer(container, cm, tracks, { transform = null }) {
 		zoom.transform(chart, transform);
 	}
 
-	function zoomToDomain(d, onEnd) {
+	function zoomToDomain(d, { onEnd = null, duration = 750 }) {
 		d = rangeIntersect(d, cm.extent())
 
 		const transform = d3.zoomIdentity
@@ -333,7 +334,7 @@ function explorer(container, cm, tracks, { transform = null }) {
 			.translate(-x(d[0]), 0);
 
 		chart.transition()
-			.duration(750)
+			.duration(duration)
 			// Assume that the transition was triggered by search when the duration is defined
 			.on("end", onEnd ? onEnd : () => true)
 			.call(zoom.transform, transform);
@@ -360,21 +361,21 @@ function explorer(container, cm, tracks, { transform = null }) {
 			const startChr = matches[1];
 			const endChr = matches[3] ? matches[3] : startChr;
 
-			const startIndex = parseInt(matches[2].replace(/,/g, ""))
-			const endIndex = parseInt(matches[4].replace(/,/g, ""))
+			const startIndex = parseInt(matches[2].replace(/,/g, ""));
+			const endIndex = parseInt(matches[4].replace(/,/g, ""));
 
 			zoomToDomain([
 				cm.linLoc([startChr, startIndex]),
-				cm.linLoc([endChr, endIndex]),
-				afterZoom
-			]);
+				cm.linLoc([endChr, endIndex])],
+				{ onEnd: afterZoom }
+			);
 
 			return;
 		}
 
 		// Match by a single chromosome
 		if (string.startsWith("chr") && Number.isInteger(cm.chromStart(string))) {
-			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], afterZoom);
+			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], { onEnd: afterZoom });
 			return;
 		}
 
@@ -384,7 +385,7 @@ function explorer(container, cm, tracks, { transform = null }) {
 			.reduce(rangeUnion, null);
 
 		if (result) {
-			zoomToDomain(result, afterZoom);
+			zoomToDomain(result, { onEnd: afterZoom });
 			return;
 		}
 
@@ -403,7 +404,7 @@ function explorer(container, cm, tracks, { transform = null }) {
 			var origDomain = scaledX.domain();
 			container.html("");
 			build();
-			zoomToDomain(origDomain);
+			zoomToDomain(origDomain, { duration: 0 });
 		},
 
 		getChart: function() {
