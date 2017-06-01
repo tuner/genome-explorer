@@ -65,34 +65,39 @@ function explorer(container, cm, tracks, { transform = null }) {
 			translateBrushElement();
 
 		} else {
-			brushInfo.html("");
+			if (brushDomain[1] != brushDomain[0]) {
+				brushInfo.html("");
 
-			//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
-			const domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
+				//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
+				const domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
 
-			brushInfo.append("h2").text("Selection:");
-			const selectionInfo = brushInfo.append("p");
-			
-			selectionInfo.append("span")
-				.text(domainToString(brushDomain.map(d => cm.chromLoc(d)))
-				+ ` (${domainLength} bp)`);
+				brushInfo.append("h2").text("Selection:");
+				const selectionInfo = brushInfo.append("p");
 
-			selectionInfo.append("button")
-				.text("Zoom to selection")
-				.on("click", () => zoomToDomain(brushDomain));
+				selectionInfo.append("span")
+					.text(domainToString(brushDomain.map(d => cm.chromLoc(d)))
+					+ ` (${domainLength} bp)`);
 
-			selectionInfo.append("button")
-				.text("Clear selection")
-				.on("click", clearBrush);
+				selectionInfo.append("button")
+					.text("Zoom to selection")
+					.on("click", () => zoomToDomain(brushDomain));
 
-			tracks.forEach(t => {
-				if (t.onBrush) {
-					t.onBrush(
-						brushDomain[0],
-						brushDomain[1],
-						brushInfo);
-				}
-			});
+				selectionInfo.append("button")
+					.text("Clear selection")
+					.on("click", clearBrush);
+
+				tracks.forEach(t => {
+					if (t.onBrush) {
+						t.onBrush(
+							brushDomain[0],
+							brushDomain[1],
+							brushInfo);
+					}
+				});
+
+			} else {
+				clearBrush();
+			}
 
 			brushStart = null;
 			brushEnd = null;
