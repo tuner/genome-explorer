@@ -7866,7 +7866,7 @@ function explorer(container, cm, tracks, _ref) {
 				})) + (" (" + domainLength + " bp)"));
 
 				selectionInfo.append("button").text("Zoom to selection").on("click", function () {
-					return zoomToDomain(brushDomain);
+					return zoomToDomain(brushDomain, clearBrush);
 				});
 
 				selectionInfo.append("button").text("Clear selection").on("click", clearBrush);
@@ -8057,18 +8057,14 @@ function explorer(container, cm, tracks, _ref) {
 		zoom$$1.transform(chart, transform);
 	}
 
-	function zoomToDomain(d, duration) {
+	function zoomToDomain(d, onEnd) {
 		var transform = identity$8.scale(width / (x(d[1]) - x(d[0]))).translate(-x(d[0]), 0);
 
-		if (duration) {
-			chart.transition().duration(duration)
-			// Assume that the transition was triggered by search when the duration is defined
-			.on("end", function () {
-				return rangeSearch.node().select();
-			}).call(zoom$$1.transform, transform);
-		} else {
-			zoomByTransform(transform);
-		}
+		chart.transition().duration(750)
+		// Assume that the transition was triggered by search when the duration is defined
+		.on("end", onEnd ? onEnd : function () {
+			return true;
+		}).call(zoom$$1.transform, transform);
 	}
 
 	function searchHelp() {
@@ -8081,6 +8077,10 @@ function explorer(container, cm, tracks, _ref) {
 	function search(string) {
 		// Try to match a range
 		var matches = string.match(/^(chr[0-9XY]+):([0-9,]+)-(?:(chr[0-9XY]+):)?([0-9,]+)$/);
+		var afterZoom = function afterZoom() {
+			return rangeSearch.node().select();
+		};
+
 		if (matches) {
 			var startChr = matches[1];
 			var endChr = matches[3] ? matches[3] : startChr;
@@ -8088,14 +8088,14 @@ function explorer(container, cm, tracks, _ref) {
 			var startIndex = parseInt(matches[2].replace(/,/g, ""));
 			var endIndex = parseInt(matches[4].replace(/,/g, ""));
 
-			zoomToDomain([cm.linLoc([startChr, startIndex]), cm.linLoc([endChr, endIndex])], 750);
+			zoomToDomain([cm.linLoc([startChr, startIndex]), cm.linLoc([endChr, endIndex]), afterZoom]);
 
 			return;
 		}
 
 		// Match by a single chromosome
 		if (string.startsWith("chr") && cm.chromStart(string)) {
-			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], 750);
+			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], afterZoom);
 			return;
 		}
 
@@ -8111,7 +8111,7 @@ function explorer(container, cm, tracks, _ref) {
 				if (t.search) {
 					var result = t.search(string);
 					if (result) {
-						zoomToDomain(result, 750);
+						zoomToDomain(result, afterZoom);
 						return;
 					}
 				}
