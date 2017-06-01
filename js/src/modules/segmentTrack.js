@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import {rangeUnion} from "./utils"
 
 export default function(cm, data, vis, { title = "", peeker = "", samples = null, sampleLabels = null, barSize = 35, barPadding = 0.3 }) {
 	var bars = null;
@@ -189,6 +190,24 @@ export default function(cm, data, vis, { title = "", peeker = "", samples = null
 
 			gridXGroup.call(xGrid);
 		},
+
+		search: function(string) {
+			if (string == "data") {
+				// A special keyword!
+				// Find a range that accommodates all segmenst
+				const result = data.map(d => [d.linearStart, d.linearEnd])
+					.reduce(rangeUnion, null);
+
+				if (result) {
+					const rangeWidth = result[1] - result[0];
+					const padding = rangeWidth * 0.25;
+					return [result[0] - padding, result[1] + padding];
+
+				} else {
+					return null;
+				}
+			}
+		}
 	}
 }
 

@@ -147,7 +147,21 @@ refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
   
   ge
 }
+
+#' Zooms into a range
+#' 
+#' Currently the range must be specified as a search string, which accepts
+#' the same search keywords and formats as the search field in the user interface.
+#' 
+#' @param search Search keyword to use for zooming in
+#' 
+#' @export
+zoom <- function(ge, search) {
+  ge$x$zoom$search <- search
   
+  ge
+}
+
 #' Shiny bindings for GenomeExplorer
 #'
 #' Output and render functions for using GenomeExplorer within Shiny

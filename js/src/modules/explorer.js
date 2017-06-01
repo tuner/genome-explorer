@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import {rangeUnion, rangeIntersect} from "./utils";
 
 "use strict";
 
@@ -325,6 +326,8 @@ function explorer(container, cm, tracks, { transform = null }) {
 	}
 
 	function zoomToDomain(d, onEnd) {
+		d = rangeIntersect(d, cm.extent())
+
 		const transform = d3.zoomIdentity
 			.scale(width / (x(d[1]) - x(d[0])))
 			.translate(-x(d[0]), 0);
@@ -370,20 +373,19 @@ function explorer(container, cm, tracks, { transform = null }) {
 		}
 
 		// Match by a single chromosome
-		if (string.startsWith("chr") && cm.chromStart(string)) {
+		if (string.startsWith("chr") && Number.isInteger(cm.chromStart(string))) {
 			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], afterZoom);
 			return;
 		}
 
 		// Search tracks
-		for (var t of tracks) {
-			if (t.search) {
-				const result = t.search(string);
-				if (result) {
-					zoomToDomain(result, afterZoom);
-					return;
-				}
-			}
+		const result = tracks.filter(t => t.search)
+			.map(t => t.search(string))
+			.reduce(rangeUnion, null);
+
+		if (result) {
+			zoomToDomain(result, afterZoom);
+			return;
 		}
 
 		alert(`No matches found for "${string}"`);
@@ -406,7 +408,9 @@ function explorer(container, cm, tracks, { transform = null }) {
 
 		getChart: function() {
 			return chart;
-		}
+		},
+
+		search: search
 	}
 
 };

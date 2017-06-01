@@ -169,6 +169,10 @@ HTMLWidgets.widget({
 					expl = explorer(innerExplorerDiv, cm, tracks, {
 						transform: expl != null ? expl.currentTransform() : null
 					});
+
+					if (x.zoom && x.zoom.search) {
+						expl.search(x.zoom.search);
+					}
 				}
 		
 				if (x.annotations && x.annotations.refseq_genes_compressed) {

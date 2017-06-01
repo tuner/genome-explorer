@@ -7702,6 +7702,42 @@ var zoom = function() {
   return zoom;
 };
 
+/**
+ * Finds a minimum range that accommodates both of the ranges a and b
+ * 
+ * @param {*} a range A 
+ * @param {*} b range B 
+ */
+function rangeUnion(a, b) {
+    if (!a) {
+        return b;
+    } else if (!b) {
+        return a;
+    }
+
+    return [Math.min(a[0], b[0]), Math.max(a[1], b[1])];
+}
+
+/**
+ * Intersects two ranges. If the ranges do not overlap, returns null.
+ * 
+ * @param {*} a range A
+ * @param {*} b range B
+ */
+function rangeIntersect(a, b) {
+    if (!a || !b) {
+        return null;
+    }
+
+    var range = [Math.max(a[0], b[0]), Math.min(a[1], b[1])];
+
+    if (range[0] <= range[1]) {
+        return range;
+    } else {
+        return null;
+    }
+}
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -8058,6 +8094,8 @@ function explorer(container, cm, tracks, _ref) {
 	}
 
 	function zoomToDomain(d, onEnd) {
+		d = rangeIntersect(d, cm.extent());
+
 		var transform = identity$8.scale(width / (x(d[1]) - x(d[0]))).translate(-x(d[0]), 0);
 
 		chart.transition().duration(750)
@@ -8094,41 +8132,21 @@ function explorer(container, cm, tracks, _ref) {
 		}
 
 		// Match by a single chromosome
-		if (string.startsWith("chr") && cm.chromStart(string)) {
+		if (string.startsWith("chr") && Number.isInteger(cm.chromStart(string))) {
 			zoomToDomain([cm.chromStart(string), cm.chromEnd(string)], afterZoom);
 			return;
 		}
 
 		// Search tracks
-		var _iteratorNormalCompletion = true;
-		var _didIteratorError = false;
-		var _iteratorError = undefined;
+		var result = tracks.filter(function (t) {
+			return t.search;
+		}).map(function (t) {
+			return t.search(string);
+		}).reduce(rangeUnion, null);
 
-		try {
-			for (var _iterator = tracks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var t = _step.value;
-
-				if (t.search) {
-					var result = t.search(string);
-					if (result) {
-						zoomToDomain(result, afterZoom);
-						return;
-					}
-				}
-			}
-		} catch (err) {
-			_didIteratorError = true;
-			_iteratorError = err;
-		} finally {
-			try {
-				if (!_iteratorNormalCompletion && _iterator.return) {
-					_iterator.return();
-				}
-			} finally {
-				if (_didIteratorError) {
-					throw _iteratorError;
-				}
-			}
+		if (result) {
+			zoomToDomain(result, afterZoom);
+			return;
 		}
 
 		alert("No matches found for \"" + string + "\"");
@@ -8153,7 +8171,9 @@ function explorer(container, cm, tracks, _ref) {
 
 		getChart: function getChart() {
 			return chart;
-		}
+		},
+
+		search: search
 	};
 }
 
@@ -8864,6 +8884,24 @@ var segmentTrack = function (cm, data, vis, _ref) {
 			xGrid.tickSize(-this.height());
 
 			gridXGroup.call(xGrid);
+		},
+
+		search: function search(string) {
+			if (string == "data") {
+				// A special keyword!
+				// Find a range that accommodates all segmenst
+				var result = data.map(function (d) {
+					return [d.linearStart, d.linearEnd];
+				}).reduce(rangeUnion, null);
+
+				if (result) {
+					var rangeWidth = result[1] - result[0];
+					var padding = rangeWidth * 0.25;
+					return [result[0] - padding, result[1] + padding];
+				} else {
+					return null;
+				}
+			}
 		}
 	};
 };
@@ -9317,6 +9355,10 @@ HTMLWidgets.widget({
 					expl = explorer(innerExplorerDiv, cm, tracks, {
 						transform: expl != null ? expl.currentTransform() : null
 					});
+
+					if (x.zoom && x.zoom.search) {
+						expl.search(x.zoom.search);
+					}
 				}
 
 				if (x.annotations && x.annotations.refseq_genes_compressed) {
