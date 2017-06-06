@@ -9119,9 +9119,9 @@ function simple(config) {
 				}
 
 				if (domain[0] < 0 && 0 < domain[1]) {
-					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#1144AA", "#F0F0F0", "#F60018"]);
+					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#1f77b4", "#F0F0F0", "#d62728"]);
 				} else {
-					colorScale = linear$2().domain(domain).range(["#1144AA", "#F60018"]);
+					colorScale = linear$2().domain(domain).range(["#1f77b4", "#d62728"]);
 				}
 			} else {
 				// Assume a nominal categorial variable
@@ -9154,15 +9154,49 @@ function simple(config) {
 
 			legend.append("span").text(config.color + ": ");
 
-			var items = legend.selectAll("div.legend-item").data(factors || domain).enter().append("div").attr("class", "legend-item");
+			var size = 12;
 
-			items.append("span").attr("class", "legend-color").style("background-color", function (d) {
-				return colorScale(d);
-			});
+			if (domain) {
+				(function () {
+					var min$$1 = domain[0];
+					var max$$1 = domain[1];
 
-			items.append("span").attr("class", "legend-label").text(function (d) {
-				return d;
-			});
+					var item = legend.append("span").attr("class", "legend-item");
+
+					item.append("span").attr("class", "legend-label").text(min$$1);
+
+					var svg = item.append("svg").attr("class", "legend-color").attr("width", size * 8).attr("height", size);
+
+					var gradientId = Math.random().toString(36).substr(2, 5);
+
+					svg.append("defs").append("linearGradient").attr("id", gradientId).selectAll("stop").data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (x) {
+						return x / 10;
+					})).enter().append("stop").attr("offset", function (x) {
+						return x * 100 + "%";
+					}).attr("stop-color", function (x) {
+						return colorScale(min$$1 + x * (max$$1 - min$$1));
+					});
+
+					svg.append("rect").attr("width", size * 8).attr("height", size).attr("fill", "url(#" + gradientId + ")");
+
+					item.append("span").attr("class", "legend-label").text(max$$1);
+				})();
+			} else if (factors) {
+
+				var items = legend.selectAll("div.legend-item").data(factors || domain).enter().append("div").attr("class", "legend-item");
+
+				// Background color of html elements is not visible in prints by default,
+				// let's use svg rectangles instead
+				items.append("svg").attr("class", "legend-color").attr("width", size).attr("height", size).append("rect").attr("width", size).attr("height", size).attr("fill", function (d) {
+					return colorScale(d);
+				});
+
+				items.append("span").attr("class", "legend-label").text(function (d) {
+					return d;
+				});
+			} else {
+				// ???
+			}
 		}
 	};
 

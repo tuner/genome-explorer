@@ -134,6 +134,7 @@ table.peeker td {
 .legend {
 	border: 1px solid #e0e0e0;
 	display: inline-block;
+	white-space: nowrap;
 	padding: 5px;
 	font-size: 11px;
 	margin-right: 10px;
@@ -144,14 +145,15 @@ table.peeker td {
 	margin-right: 10px;
 }
 
-.legend-color {
+.legend-item svg.legend-color {
+	position: relative;
 	display: inline-block;
-	width: 10px;
-	height: 10px;
+	top: 2px;
+	display: inline;
 }
 
 .legend-label {
-	margin-left: 5px;
+	margin: 0 5px;
 }
 
 
