@@ -66,7 +66,7 @@ export default function(cm, data, vis, { title = "", peeker = "", samples = null
 
 			if (vis.evaluateData) vis.evaluateData(data);
 
-			if (vis.produceLegend) vis.produceLegend(callbacks.legends());
+			if (vis.produceLegend) vis.produceLegend(callbacks.legends(), title);
 
 		},
 

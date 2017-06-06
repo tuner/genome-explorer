@@ -46,7 +46,7 @@ export function islands(config) {
  * 
  * TODO: Adapt to min/max values, produce a legend
  */
-export function upOrDown(config) {
+export function upOrDown(segmentTrack, config) {
 	if (!config.height) {
 		// TODO: An exception or something
 		alert("upOrDown visualization requires the 'height' config option!");
@@ -208,7 +208,7 @@ export function simple(config) {
 		}
 	}
 
-	decorate.produceLegend = function produceLegend(container) {
+	decorate.produceLegend = function produceLegend(container, trackTitle) {
 		if (factors || domain) {
 			const legend = container
 				.append("div")
@@ -220,6 +220,11 @@ export function simple(config) {
 				.attr("class", "legend-title")
 				.text("");
 				*/
+
+			if (trackTitle && trackTitle != "") {
+				legend.append("span")
+					.text(trackTitle + " - ");
+			}
 
 			legend.append("span")
 				.text(config.color + ": ");

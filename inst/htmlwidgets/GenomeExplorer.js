@@ -8769,7 +8769,7 @@ var segmentTrack = function (cm, data, vis, _ref) {
 
 			if (vis.evaluateData) vis.evaluateData(data);
 
-			if (vis.produceLegend) vis.produceLegend(callbacks.legends());
+			if (vis.produceLegend) vis.produceLegend(callbacks.legends(), title);
 		},
 
 		zoomed: function zoomed(transform, scaledX) {
@@ -8976,7 +8976,7 @@ function islands(config) {
  * 
  * TODO: Adapt to min/max values, produce a legend
  */
-function upOrDown(config) {
+function upOrDown(segmentTrack, config) {
 	if (!config.height) {
 		// TODO: An exception or something
 		alert("upOrDown visualization requires the 'height' config option!");
@@ -9138,7 +9138,7 @@ function simple(config) {
 		}
 	};
 
-	decorate.produceLegend = function produceLegend(container) {
+	decorate.produceLegend = function produceLegend(container, trackTitle) {
 		if (factors || domain) {
 			var legend = container.append("div").attr("class", "legend").append("div");
 
@@ -9147,6 +9147,10 @@ function simple(config) {
    				.attr("class", "legend-title")
    				.text("");
    				*/
+
+			if (trackTitle && trackTitle != "") {
+				legend.append("span").text(trackTitle + " - ");
+			}
 
 			legend.append("span").text(config.color + ": ");
 
