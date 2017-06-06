@@ -187,11 +187,11 @@ export function simple(config) {
 				if (domain[0] < 0 && 0 < domain[1]) {
 					colorScale = d3.scaleLinear()
 						.domain([domain[0], 0, domain[1]])
-						.range(["#1f77b4", "#F0F0F0", "#d62728"]);
+						.range(["#128be8", "#F0F0F0", "#1f77b4"]);
 				} else {
-					colorScale = d3.scaleLinear()
-						.domain(domain)
-						.range(["#1f77b4", "#d62728"]);
+					colorScale = d3.scaleSequential(
+						d3.interpolateRgbBasis(["#128be8", "#c071e8", "#db1e18"]))
+						.domain(domain);
 				}
 
 			} else {

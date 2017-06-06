@@ -1909,6 +1909,18 @@ function basis(t1, v0, v1, v2, v3) {
       + t3 * v3) / 6;
 }
 
+var basis$1 = function(values) {
+  var n = values.length - 1;
+  return function(t) {
+    var i = t <= 0 ? (t = 0) : t >= 1 ? (t = 1, n - 1) : Math.floor(t * n),
+        v1 = values[i],
+        v2 = values[i + 1],
+        v0 = i > 0 ? values[i - 1] : 2 * v1 - v2,
+        v3 = i < n - 1 ? values[i + 2] : 2 * v2 - v1;
+    return basis((t - i / n) * n, v0, v1, v2, v3);
+  };
+};
+
 var constant$3 = function(x) {
   return function() {
     return x;
@@ -1964,6 +1976,34 @@ var interpolateRgb = ((function rgbGamma(y) {
 
   return rgb$$1;
 }))(1);
+
+function rgbSpline(spline) {
+  return function(colors) {
+    var n = colors.length,
+        r = new Array(n),
+        g = new Array(n),
+        b = new Array(n),
+        i, color$$1;
+    for (i = 0; i < n; ++i) {
+      color$$1 = rgb(colors[i]);
+      r[i] = color$$1.r || 0;
+      g[i] = color$$1.g || 0;
+      b[i] = color$$1.b || 0;
+    }
+    r = spline(r);
+    g = spline(g);
+    b = spline(b);
+    color$$1.opacity = 1;
+    return function(t) {
+      color$$1.r = r(t);
+      color$$1.g = g(t);
+      color$$1.b = b(t);
+      return color$$1 + "";
+    };
+  };
+}
+
+var rgbBasis = rgbSpline(basis$1);
 
 var array$1 = function(a, b) {
   var nb = b ? b.length : 0,
@@ -9119,9 +9159,9 @@ function simple(config) {
 				}
 
 				if (domain[0] < 0 && 0 < domain[1]) {
-					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#1f77b4", "#F0F0F0", "#d62728"]);
+					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#128be8", "#F0F0F0", "#1f77b4"]);
 				} else {
-					colorScale = linear$2().domain(domain).range(["#1f77b4", "#d62728"]);
+					colorScale = sequential(rgbBasis(["#128be8", "#c071e8", "#db1e18"])).domain(domain);
 				}
 			} else {
 				// Assume a nominal categorial variable
