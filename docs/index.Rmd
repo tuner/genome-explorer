@@ -1,7 +1,7 @@
 ---
 title: "A Tutorial to Genome Explorer in R"
 author: "Kari Lavikka"
-date: "Mar 16, 2017"
+date: "Jun 7, 2017"
 output:
   html_document:
     mathjax: null
@@ -128,6 +128,47 @@ GenomeExplorer("hg38") %>%
   refseqGeneTrack()
 ```
 
-## Best practices
+## Using in Shiny
 
-TODO
+Here is an example of a trivial Shiny app.
+
+
+```{r eval=FALSE}
+library(shiny)
+library(GenomeExplorer)
+library(magrittr)
+
+ui <- basicPage(
+  GenomeExplorerOutput("myExplorer"),
+  verbatimTextOutput("info")
+)
+
+server <- function(input, output) {
+  output$myExplorer <- renderGenomeExplorer({
+    GenomeExplorer("hg38") %>%
+      segmentTrack(data.frame(chrom = c("chr5"), start = c(50000000), end = c(150000000)))
+  })
+  
+  output$info <- renderText({
+    # Display the brushed range
+    if (!is.null(input$myExplorer_brushed)) {
+      with(input$myExplorer_brushed,
+           sprintf("Brushed range: %s:%d - %s:%d", start$chrom, start$pos, end$chrom, end$pos))
+    }
+  })
+}
+
+shinyApp(ui, server)
+```
+
+GenomeExplorer communicates brushing (range selection) events back to Shiny and exposes
+the selection in the input variable `outputId_brushed` where outputId is the id that has
+been given to the component. In the example above it is `myExplorer`. The data structure
+is a two-level list or NULL if the selection was discarded:
+
+```{r eval=FALSE}
+list(
+  start = list(chrom = "chr4", pos = 123456),
+  end = list(chrom = "chr7", pos = 654321)
+)
+```

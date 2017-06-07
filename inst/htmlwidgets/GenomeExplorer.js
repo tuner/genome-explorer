@@ -7868,7 +7868,9 @@ var numberFormat = format(",d");
 
 function explorer(container, cm, tracks, _ref) {
 	var _ref$transform = _ref.transform,
-	    transform = _ref$transform === undefined ? null : _ref$transform;
+	    transform = _ref$transform === undefined ? null : _ref$transform,
+	    _ref$onBrush = _ref.onBrush,
+	    onBrush = _ref$onBrush === undefined ? null : _ref$onBrush;
 
 
 	/**
@@ -7929,29 +7931,12 @@ function explorer(container, cm, tracks, _ref) {
 			translateBrushElement();
 		} else {
 			if (brushDomain[1] != brushDomain[0]) {
-				brushInfo.html("");
-
-				//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
-				var domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
-
-				brushInfo.append("h2").text("Selection:");
-				var selectionInfo = brushInfo.append("p");
-
-				selectionInfo.append("span").text(domainToString(brushDomain.map(function (d) {
-					return cm.chromLoc(d);
-				})) + (" (" + domainLength + " bp)"));
-
-				selectionInfo.append("button").text("Zoom to selection").on("click", function () {
-					return zoomToDomain(brushDomain, { onEnd: clearBrush });
-				});
-
-				selectionInfo.append("button").text("Clear selection").on("click", clearBrush);
-
-				tracks.forEach(function (t) {
-					if (t.onBrush) {
-						t.onBrush(brushDomain[0], brushDomain[1], brushInfo);
-					}
-				});
+				onBrushEnd(brushDomain);
+				if (onBrush) {
+					onBrush(brushDomain.map(function (d) {
+						return cm.chromLoc(Math.round(d));
+					}));
+				}
 			} else {
 				clearBrush();
 			}
@@ -7990,9 +7975,39 @@ function explorer(container, cm, tracks, _ref) {
 	}
 
 	function clearBrush() {
+		if (onBrush) {
+			onBrush(null);
+		}
+
 		brushInfo.html("");
 		brushDomain = null;
 		translateBrushElement();
+	}
+
+	function onBrushEnd(brushDomain) {
+		brushInfo.html("");
+
+		//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
+		var domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
+
+		brushInfo.append("h2").text("Selection:");
+		var selectionInfo = brushInfo.append("p");
+
+		selectionInfo.append("span").text(domainToString(brushDomain.map(function (d) {
+			return cm.chromLoc(d);
+		})) + (" (" + domainLength + " bp)"));
+
+		selectionInfo.append("button").text("Zoom to selection").on("click", function () {
+			return zoomToDomain(brushDomain, { onEnd: clearBrush });
+		});
+
+		selectionInfo.append("button").text("Clear selection").on("click", clearBrush);
+
+		tracks.forEach(function (t) {
+			if (t.onBrush) {
+				t.onBrush(brushDomain[0], brushDomain[1], brushInfo);
+			}
+		});
 	}
 
 	/**
@@ -9436,7 +9451,19 @@ HTMLWidgets.widget({
 					innerExplorerDiv.html("");
 
 					expl = explorer(innerExplorerDiv, cm, tracks, {
-						transform: expl != null ? expl.currentTransform() : null
+						transform: expl != null ? expl.currentTransform() : null,
+						onBrush: function onBrush(domain) {
+							if (HTMLWidgets.shinyMode) {
+								Shiny.onInputChange(el.id + "_brushed:GenomeExplorerRange", domain ? { start: {
+										chrom: domain[0][0],
+										pos: domain[0][1]
+									},
+									end: {
+										chrom: domain[1][0],
+										pos: domain[1][1]
+									} } : null);
+							}
+						}
 					});
 
 					if (x.zoom && x.zoom.search) {

@@ -7,7 +7,7 @@ var instanceCounter = 0;
 
 const numberFormat = d3.format(",d");
 
-function explorer(container, cm, tracks, { transform = null }) {
+function explorer(container, cm, tracks, { transform = null, onBrush = null }) {
 
 	/**
 	 * Returns a UCSC Genome Browser -style string presentation of the domain.
@@ -67,35 +67,10 @@ function explorer(container, cm, tracks, { transform = null }) {
 
 		} else {
 			if (brushDomain[1] != brushDomain[0]) {
-				brushInfo.html("");
-
-				//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
-				const domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
-
-				brushInfo.append("h2").text("Selection:");
-				const selectionInfo = brushInfo.append("p");
-
-
-				selectionInfo.append("span")
-					.text(domainToString(brushDomain.map(d => cm.chromLoc(d)))
-					+ ` (${domainLength} bp)`);
-
-				selectionInfo.append("button")
-					.text("Zoom to selection")
-					.on("click", () => zoomToDomain(brushDomain, { onEnd: clearBrush }));
-
-				selectionInfo.append("button")
-					.text("Clear selection")
-					.on("click", clearBrush);
-
-				tracks.forEach(t => {
-					if (t.onBrush) {
-						t.onBrush(
-							brushDomain[0],
-							brushDomain[1],
-							brushInfo);
-					}
-				});
+				onBrushEnd(brushDomain);
+				if (onBrush) {
+					onBrush(brushDomain.map(d => cm.chromLoc(Math.round(d))));
+				}
 
 			} else {
 				clearBrush();
@@ -144,9 +119,46 @@ function explorer(container, cm, tracks, { transform = null }) {
 	}
 
 	function clearBrush() {
+		if (onBrush) {
+			onBrush(null);
+		}
+
 		brushInfo.html("");
 		brushDomain = null;
 		translateBrushElement();
+	}
+
+	function onBrushEnd(brushDomain) {
+		brushInfo.html("");
+
+		//const domainLength = d3.format(",d").apply(brushDomain[1] - brushDomain[0]);
+		const domainLength = numberFormat(brushDomain[1] - brushDomain[0]);
+
+		brushInfo.append("h2").text("Selection:");
+		const selectionInfo = brushInfo.append("p");
+
+
+		selectionInfo.append("span")
+			.text(domainToString(brushDomain.map(d => cm.chromLoc(d)))
+			+ ` (${domainLength} bp)`);
+
+		selectionInfo.append("button")
+			.text("Zoom to selection")
+			.on("click", () => zoomToDomain(brushDomain, { onEnd: clearBrush }));
+
+		selectionInfo.append("button")
+			.text("Clear selection")
+			.on("click", clearBrush);
+
+		tracks.forEach(t => {
+			if (t.onBrush) {
+				t.onBrush(
+					brushDomain[0],
+					brushDomain[1],
+					brushInfo);
+			}
+		});
+
 	}
 
 	/**

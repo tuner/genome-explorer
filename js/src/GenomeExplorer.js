@@ -167,7 +167,20 @@ HTMLWidgets.widget({
 					innerExplorerDiv.html("");
 
 					expl = explorer(innerExplorerDiv, cm, tracks, {
-						transform: expl != null ? expl.currentTransform() : null
+						transform: expl != null ? expl.currentTransform() : null,
+						onBrush: function(domain) {
+							if (HTMLWidgets.shinyMode) {
+								Shiny.onInputChange(el.id+ "_brushed:GenomeExplorerRange",
+									domain ? { start: {
+										chrom: domain[0][0],
+										pos: domain[0][1]
+									},
+									end : {
+										chrom: domain[1][0],
+										pos: domain[1][1]
+									}} : null);
+							}
+						}
 					});
 
 					if (x.zoom && x.zoom.search) {

@@ -189,3 +189,14 @@ renderGenomeExplorer <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
   htmlwidgets::shinyRenderWidget(expr, GenomeExplorerOutput, env, quoted = TRUE)
 }
+
+.onLoad <- function(libname, pkgname) {
+  shiny::registerInputHandler("GenomeExplorerRange", function(data, ...) {
+    #jsonlite::fromJSON(jsonlite::toJSON(data, auto_unbox = TRUE))
+    data
+  }, force = TRUE)
+}
+
+.onUnload <- function(libname) {
+  shiny::removeInputHandler("GenomeExplorerRange")
+}
