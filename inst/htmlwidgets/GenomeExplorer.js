@@ -9161,6 +9161,8 @@ function simple(config) {
 				return d;
 			});
 
+			var colorPalette = Array.isArray(config.colorPalette) ? config.colorPalette : null;
+
 			if (typeof first == "number") {
 				if (Array.isArray(config.domain) && config.domain.length == 2) {
 					domain = config.domain;
@@ -9173,8 +9175,10 @@ function simple(config) {
 					}, [Infinity, -Infinity]);
 				}
 
-				if (domain[0] < 0 && 0 < domain[1]) {
-					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#128be8", "#F0F0F0", "#1f77b4"]);
+				if (colorPalette) {
+					colorScale = sequential(rgbBasis(colorPalette)).domain(domain);
+				} else if (domain[0] < 0 && 0 < domain[1]) {
+					colorScale = linear$2().domain([domain[0], 0, domain[1]]).range(["#128be8", "#F0F0F0", "#db1e18"]);
 				} else {
 					colorScale = sequential(rgbBasis(["#128be8", "#c071e8", "#db1e18"])).domain(domain);
 				}
@@ -9188,7 +9192,7 @@ function simple(config) {
 					}).keys();
 				}
 
-				colorScale = ordinal(factors.length <= 10 ? category10 : category20);
+				colorScale = colorPalette ? ordinal(colorPalette) : ordinal(factors.length <= 10 ? category10 : category20);
 			}
 		}
 	};

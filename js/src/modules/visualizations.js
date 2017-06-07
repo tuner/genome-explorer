@@ -173,6 +173,9 @@ export function simple(config) {
 		if (config && config.color) {
 			let first = data.map(d => d.data[config.color]).find(d => d);
 
+			const colorPalette = Array.isArray(config.colorPalette) ?
+				config.colorPalette : null;
+
 			if (typeof first == "number") {
 				if (Array.isArray(config.domain) && config.domain.length == 2) {
 					domain = config.domain;
@@ -184,10 +187,15 @@ export function simple(config) {
 						[Infinity, -Infinity]);
 				}
 
-				if (domain[0] < 0 && 0 < domain[1]) {
+				if (colorPalette) {
+					colorScale = d3.scaleSequential(
+						d3.interpolateRgbBasis(colorPalette))
+						.domain(domain);
+
+				} else if (domain[0] < 0 && 0 < domain[1]) {
 					colorScale = d3.scaleLinear()
 						.domain([domain[0], 0, domain[1]])
-						.range(["#128be8", "#F0F0F0", "#1f77b4"]);
+						.range(["#128be8", "#F0F0F0", "#db1e18"]);
 				} else {
 					colorScale = d3.scaleSequential(
 						d3.interpolateRgbBasis(["#128be8", "#c071e8", "#db1e18"]))
@@ -202,7 +210,9 @@ export function simple(config) {
 					factors = d3.map(data, d => d.data[config.color]).keys();
 				}
 
-				colorScale = d3.scaleOrdinal(factors.length <= 10 ? d3.schemeCategory10 : d3.schemeCategory20);
+				colorScale = colorPalette ?
+					d3.scaleOrdinal(colorPalette) :
+					d3.scaleOrdinal(factors.length <= 10 ? d3.schemeCategory10 : d3.schemeCategory20);
 			}
 		}
 	}
