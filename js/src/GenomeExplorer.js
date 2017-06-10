@@ -45,6 +45,7 @@ function getOrFetchAnnotation(url, cm, callback) {
 				callback(genes);
 			}, error => {
 				alert(`Can't load annotations: ${error}, url: ${url}`);
+				callback(null);
 			});
 	}
 }
@@ -189,9 +190,10 @@ HTMLWidgets.widget({
 				}
 		
 				if (x.annotations && x.annotations.refseq_genes_compressed) {
-					// TODO: Show something even if annotations could not be loaded
 					getOrFetchAnnotation(x.annotations.refseq_genes_compressed, cm, genes => {
-						tracks.push(geneTrack(genes, { peeker: tp }));
+						if (genes != null) {
+							tracks.push(geneTrack(genes, { peeker: tp }));
+						}
 						buildExplorer();
 					});
 
