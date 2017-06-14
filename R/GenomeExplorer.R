@@ -7,6 +7,8 @@
 #'
 #' @import htmlwidgets
 #'
+#' @author Kari Lavikka, \email{kari.lavikka@@helsinki.fi}
+#' 
 #' @export
 GenomeExplorer <- function(genome, width = "100%", height = "auto", elementId = NULL) {
   if (is.character(genome)) {
@@ -70,12 +72,12 @@ readCytobands <- function(file) {
 #' Adds a segment track to Genome Explorer
 #' 
 #' A segment is a region in a chromosome. It has start and end coordinates, which are
-#' indexed in a UCSC style 1-indexed closed ranges.
+#' indexed in UCSC style 1-indexed closed ranges.
 #' 
 #' A segment track uses a user-defined method for visualizing arbitrary columns
-#' in the data. Currently supported methods are \code{simple} and \code{cnvAndBaf}.
+#' in the data. Currently supported methods are \code{\link{simpleVis}} and \code{\link{cnvVis}}.
 #' 
-#' @param ge The Genome Explorer object.
+#' @param ge A GenomeExplorer instance.
 #' @param data A data frame that contains the segments being visualized.
 #' @param discriminator An optional discriminator column that is used for
 #'   spreading the data (cases) to subtracks.
@@ -84,22 +86,33 @@ readCytobands <- function(file) {
 #' @param end The column containing the end coordinate of the genomic region.
 #' @param samples An optional vector that specifies the order of the samples.
 #'   By default the samples are ordered alphabetically.
-#' @param sample_labels An optional vector that specifies replacement labels
+#' @param sampleLabels An optional vector that specifies replacement labels
 #'   for the samples.
-#' @param vis Visualization to use.
-#' @param vis_config Optional configuration options for the visualization.
+#' @param vis Visualization to use. By default an unconfigured "simple" visualization
+#'   is used.
 #' @param title Title of the track.
-#' @param subtrack_size Subtrack thickness (height) in pixels.
-#' @param subtrack_padding Padding between the subtracks in proportion to thickness.
+#' @param subtrackSize Subtrack thickness (height) in pixels.
+#' @param subtrackPadding Padding between the subtracks in proportion to thickness.
+#' 
+#' @return The same GenomeExplorer instance that was passed in
+#' 
+#' @examples
+#' segmentTrack(
+#'   ge
+#'   data,
+#'   discriminator = "patient",
+#'   vis = simpleVis(color = "type")
+#' )
 #' 
 #' @export
 segmentTrack <- function(ge, data, discriminator = NULL,
                       chrom = "chrom", start = "start", end = "end",
-                      samples = NULL, sample_labels = NULL,
-                      vis = "simple", vis_config = list(),
+                      samples = NULL, sampleLabels = NULL,
+                      vis = simpleVis(),
                       title = NULL,
-                      subtrack_size = 30, subtrack_padding = 0.2) {
+                      subtrackSize = 30, subtrackPadding = 0.2) {
   
+  # TODO: Figure out a way to do this automatically:
   x <- list(
     data = data,
     discriminator = discriminator,
@@ -107,17 +120,94 @@ segmentTrack <- function(ge, data, discriminator = NULL,
     start = start,
     end = end,
     samples = samples,
-    sample_labels = sample_labels,
+    sample_labels = sampleLabels,
     vis = vis,
-    vis_config = vis_config,
     title = title,
-    subtrack_size = subtrack_size,
-    subtrack_padding = subtrack_padding
+    subtrack_size = subtrackSize,
+    subtrack_padding = subtrackPadding
   )
 
   ge$x$tracks <- append(ge$x$tracks, list(x))
 
   ge
+}
+
+#' Creates a configuration for "simple" visualization
+#'
+#' A simple visualization fills the segments with a color based on a variable.
+#' The variable can be either continuous (numeric) or categorial (non-numeric).
+#' Continuous variables are mapped to a color from a gradient. Color for
+#' categorial variables are picked from a color palette. Sensible default
+#' gradients and palettes are provided, but they can be overriden.
+#' 
+#' @param color The name of the variable that is used for color mapping.
+#'   By default a default color is used for all segments.
+#'   
+#' @param domain An optional domain. By default the domain is obtained from
+#'   the data.
+#'   
+#'   The domain for a continuous variable is passed as a vector
+#'   that contains the minimum and maximum values. For categorial variables
+#'   the vector should contain all categories.
+#'   
+#'   This option is particularly useful in a Shiny application where the data
+#'   is filtered and the domain might change. Static domain prevents the color
+#'   mapping from going awry.
+#'
+#' @param colorPalette An optional color palette. The palette is a vector
+#'   of #RRGGBB values, which can be be provided inline or obtained from
+#'   RColorBrewer, for example.
+#'   
+#'   For continuous variables the palette must contain at least two colors -
+#'   one for the minimum value and another for the maximum value. A smooth
+#'   gradient is interpolated between those values. An arbitrary number of
+#'   intermediate colors can be provided for more expressiveness.
+#'   
+#'   For categorial variables the colors are discrete and are mapped to
+#'   different categories in the same order as they are in the domain.
+#'   If the number of categories exceeds the number of colors, the colors
+#'   are re-used from the beginning.
+#'  
+#' @return A configuration for the simple visualization
+#' 
+#' @examples
+#' simpleVis("score", domain = c(0, 50))
+#' simpleVis("type",
+#'           domain = c("nonsynonymous", "synonymous", "stopgain", "stoploss")
+#'           colorPalette = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3"))
+#' simpleVis("type", colorPalette = RColorBrewer::brewer.pal(4, "Set1"))
+#' 
+#' @export
+simpleVis <- function(color = NULL, domain = NULL, colorPalette = NULL) {
+  list(
+    type = "simple",
+    config = list(
+      color = color,
+      domain = domain,
+      colorPalette = colorPalette
+    )
+  )
+}
+
+#' Creates a configuration for "Copy number variation" visualization
+#'
+#' Both of the parameters \code{seg} and \code{baf} are optional, but leaving
+#' both empty is pointless.
+#' 
+#' @param seg Name of the segment mean variable
+#' @param baf Name of the B allele frequency variable
+#' 
+#' @return A configuration for the cnv visualization
+#' 
+#' @export
+cnvVis <- function(seg = NULL, baf = NULL) {
+  list(
+    type = "cnv",
+    config = list(
+      seg = seg,
+      baf = baf
+    )
+  )
 }
 
 #' Adds a refseq gene annotation track to Genome Explorer
@@ -148,20 +238,46 @@ refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
   ge
 }
 
-#' Zooms into a range
+#' Searches a cytoband, chromosome or a refseq gene.
 #' 
-#' Currently the range must be specified as a search string, which accepts
-#' the same search keywords and formats as the search field in the user interface.
+#' Search accepts the same search keywords and formats as the search field in
+#' the user interface.
 #' 
-#' @param search Search keyword to use for zooming in
+#' Gene search is only available if gene annotation track has been added to the
+#' explorer.
+#' 
+#' @param ge A GenomeExplorer instance
+#' @param search The search keyword
+#' 
+#' @examples
+#' search(ge, "tp53")
+#' search(ge, "14q32")
 #' 
 #' @export
-zoom <- function(ge, search) {
+search <- function(ge, search) {
+  print(search)
   ge$x$zoom$search <- search
   
   ge
 }
 
+#' Zooms into the specified region
+#' 
+#' @param ge A GenomeExplorer instance
+#' @param startChrom,endChrom A chromosome
+#' @param startPos,endPos A position within the chromosome
+#' 
+#' @examples
+#' zoom(ge, "chr2", 123456, "chr4", 34567890)
+#' 
+#' @export
+zoom <- function(ge, startChrom, startPos, endChrom, endPos) {
+  # Zoom is actually just a convenience method for search
+  ge <- search(ge, sprintf("%s:%d-%s:%d", startChrom, startPos, endChrom, endPos))
+  
+  ge
+}
+  
 #' Shiny bindings for GenomeExplorer
 #'
 #' Output and render functions for using GenomeExplorer within Shiny

@@ -102,7 +102,7 @@ export function simpleContinuous(config) {
 	return decorate;
 }
 
-export function cnvAndBaf(config) {
+export function cnv(config) {
 	const colorScale = d3.scaleLinear()
 		.domain([-3, 0, 1.5])
 		.range(["blue", "white", "red"]);
@@ -111,13 +111,13 @@ export function cnvAndBaf(config) {
 		const bafDefaultColor = d3.hsl(0, 0, 180);
 
 		if (config) {
-			if (config.cnv) {
+			if (config.seg) {
 				let rects = newBars.append("rect")
 					.attr("height", 1)
 					.attr("y", 0)
 					.attr("width", 1);
 
-				rects.attr("fill", d => colorScale(d.data[config.cnv]));
+				rects.attr("fill", d => colorScale(d.data[config.seg]));
 			}
 
 			if (config.baf) {

@@ -5,12 +5,12 @@
 \title{Adds a segment track to Genome Explorer}
 \usage{
 segmentTrack(ge, data, discriminator = NULL, chrom = "chrom",
-  start = "start", end = "end", samples = NULL, sample_labels = NULL,
-  vis = "simple", vis_config = list(), title = NULL, subtrack_size = 30,
-  subtrack_padding = 0.2)
+  start = "start", end = "end", samples = NULL, sampleLabels = NULL,
+  vis = simpleVis(), title = NULL, subtrackSize = 30,
+  subtrackPadding = 0.2)
 }
 \arguments{
-\item{ge}{The Genome Explorer object.}
+\item{ge}{A GenomeExplorer instance.}
 
 \item{data}{A data frame that contains the segments being visualized.}
 
@@ -26,24 +26,35 @@ spreading the data (cases) to subtracks.}
 \item{samples}{An optional vector that specifies the order of the samples.
 By default the samples are ordered alphabetically.}
 
-\item{sample_labels}{An optional vector that specifies replacement labels
+\item{sampleLabels}{An optional vector that specifies replacement labels
 for the samples.}
 
-\item{vis}{Visualization to use.}
-
-\item{vis_config}{Optional configuration options for the visualization.}
+\item{vis}{Visualization to use. By default an unconfigured "simple" visualization
+is used.}
 
 \item{title}{Title of the track.}
 
-\item{subtrack_size}{Subtrack thickness (height) in pixels.}
+\item{subtrackSize}{Subtrack thickness (height) in pixels.}
 
-\item{subtrack_padding}{Padding between the subtracks in proportion to thickness.}
+\item{subtrackPadding}{Padding between the subtracks in proportion to thickness.}
+}
+\value{
+The same GenomeExplorer instance that was passed in
 }
 \description{
 A segment is a region in a chromosome. It has start and end coordinates, which are
-indexed in a UCSC style 1-indexed closed ranges.
+indexed in UCSC style 1-indexed closed ranges.
 }
 \details{
 A segment track uses a user-defined method for visualizing arbitrary columns
-in the data. Currently supported methods are \code{simple} and \code{cnvAndBaf}.
+in the data. Currently supported methods are \code{\link{simpleVis}} and \code{\link{cnvVis}}.
+}
+\examples{
+segmentTrack(
+  ge
+  data,
+  discriminator = "patient",
+  vis = simpleVis(color = "type")
+)
+
 }

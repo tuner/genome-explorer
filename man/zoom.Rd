@@ -2,14 +2,21 @@
 % Please edit documentation in R/GenomeExplorer.R
 \name{zoom}
 \alias{zoom}
-\title{Zooms into a range}
+\title{Zooms into the specified region}
 \usage{
-zoom(ge, search)
+zoom(ge, startChrom, startPos, endChrom, endPos)
 }
 \arguments{
-\item{search}{Search keyword to use for zooming in}
+\item{ge}{A GenomeExplorer instance}
+
+\item{startChrom, endChrom}{A chromosome}
+
+\item{startPos, endPos}{A position within the chromosome}
 }
 \description{
-Currently the range must be specified as a search string, which accepts
-the same search keywords and formats as the search field in the user interface.
+Zooms into the specified region
+}
+\examples{
+zoom(ge, "chr2", 123456, "chr4", 34567890)
+
 }

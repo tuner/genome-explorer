@@ -2,9 +2,12 @@
 
 export(GenomeExplorer)
 export(GenomeExplorerOutput)
+export(cnvVis)
 export(readCytobands)
 export(refseqGeneTrack)
 export(renderGenomeExplorer)
+export(search)
 export(segmentTrack)
+export(simpleVis)
 export(zoom)
 import(htmlwidgets)

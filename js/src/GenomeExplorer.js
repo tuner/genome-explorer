@@ -148,7 +148,7 @@ HTMLWidgets.widget({
 					tracks.push(segmentTrack(
 						cm,
 						d3data,
-						visualizations[t.vis](t.vis_config),
+						visualizations[t.vis.type](t.vis.config),
 						{
 							title: t.title,
 							peeker: tp,

@@ -1,8 +1,11 @@
 Package: GenomeExplorer
 Title: Displays genomic regions on linear tracks
-Version: 0.0.9
+Version: 0.1.0
 Authors@R: person("Kari", "Lavikka", email = "kari.lavikka@helsinki.fi", role = c("aut", "cre"))
-Description: Displays genomic regions on linear tracks
+Description:
+    GenomeExplorer is an interactive tool for visualizing genomic regions or
+    coordinates on linear tracks. Regions can be colored based on variables
+    in the data.
 Depends: R (>= 3.3.1)
 Imports:
     magrittr,

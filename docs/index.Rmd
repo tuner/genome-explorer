@@ -31,7 +31,7 @@ devtools::install_github("tuner/genome-explorer")
 
 Let's first import the library. We also use magrittr to conveniently add features to Genome Explorer by using the pipe **%>%** operator.
 
-```{r}
+```{r warning = FALSE, message = FALSE}
 library(GenomeExplorer)
 library(magrittr)
 ```
@@ -49,6 +49,12 @@ data <- data.frame(
 
 GenomeExplorer("hg38") %>%
   segmentTrack(data)
+```
+
+Genome Explorer functions are thoroughly documented. To get help, just type, for example:
+
+```{r eval=FALSE}
+?segmentTrack
 ```
 
 ## A more advanced example
@@ -72,8 +78,7 @@ GenomeExplorer("hg38") %>%
   segmentTrack(
     data,
     discriminator = "patient",
-    vis = "simple",
-    vis_config = list(
+    vis = simpleVis(
       color = "type"
     )
   )
@@ -85,7 +90,7 @@ GenomeExplorer("hg38") %>%
 data <- read.table("example_cnv.tsv", header = TRUE, sep = "\t")
 ```
 
-We finally move on to a real use case. Our data now contains genomic ranges with CNV (Copy number variation) and BAF (B Allele Frequency) values. Here's a sample of the dataset:
+We finally move on to a real use case. Our data now contains genomic ranges with copy number variation data. We have two variables: Seg (segment mean) and BAF (B Allele Frequency) values. Here's a sample of the dataset:
 
 ```{r echo = FALSE}
 data[1:8, ]
@@ -95,14 +100,14 @@ The columns that define the genomic coordinates are now named differently. Fortu
 
 Because we would like to compare the diagnosis (D) and relapse (R) samples side by side, we explicitly enumerate the cases in a specific order. By default, they are ordered alphanumerically.
 
-Genome Explorer provides you with a particular visualization (_cnvAndBaf_) for CNV and BAF data. CNV, which is expressed as *segment mean*, is displayed as a color, ranging from blue (negative, deletion) to red (positive, amplification) through white (zero, no change). BAF is actually displayed as LOH (Loss of Heterozygosity), which is calculated using the formula: |*baf* - 0.5| * 2. The height of the bar is determined by LOH, 0% means full heterozygosity, 100% mean total loss of the B allele.
+Genome Explorer provides you with a particular visualization (_cnvVis_) for CNV and BAF data. CNV, which is expressed as *segment mean*, is displayed as a color, ranging from blue (negative, deletion) to red (positive, amplification) through white (zero, no change). BAF is actually displayed as LOH (Loss of Heterozygosity), which is calculated using the formula: |*baf* - 0.5| * 2. The height of the bar is determined by LOH, 0% means full heterozygosity, 100% mean total loss of the B allele.
 
 We also define a title for the data track. Looks prettier that way.
 
 As a final touch we include a gene annotation track, which gives our data some context. The genes and transcripts become visible when you zoom in enough.
 
 ```{r}
-GenomeExplorer("hg38") %>%
+GenomeExplorer("hg19") %>%
   segmentTrack(
     data,
     
@@ -116,10 +121,9 @@ GenomeExplorer("hg38") %>%
     samples = c("D1", "R1",
                 "D2", "R2"),
     
-    vis = "cnvAndBaf",
-    vis_config = list(
+    vis = cnvVis(
       # Define the columns. Defining both of them is not mandatory.
-      cnv = "segMean",
+      seg = "segMean",
       baf = "bafMean"
     ),
     

@@ -9091,18 +9091,18 @@ function simpleContinuous(config) {
 	return decorate;
 }
 
-function cnvAndBaf(config) {
+function cnv(config) {
 	var colorScale = linear$2().domain([-3, 0, 1.5]).range(["blue", "white", "red"]);
 
 	var decorate = function decorate(newBars) {
 		var bafDefaultColor = hsl(0, 0, 180);
 
 		if (config) {
-			if (config.cnv) {
+			if (config.seg) {
 				var rects = newBars.append("rect").attr("height", 1).attr("y", 0).attr("width", 1);
 
 				rects.attr("fill", function (d) {
-					return colorScale(d.data[config.cnv]);
+					return colorScale(d.data[config.seg]);
 				});
 			}
 
@@ -9268,7 +9268,7 @@ var visualizations = Object.freeze({
 	upOrDown: upOrDown,
 	expression: expression,
 	simpleContinuous: simpleContinuous,
-	cnvAndBaf: cnvAndBaf,
+	cnv: cnv,
 	simple: simple
 });
 
@@ -9438,7 +9438,7 @@ HTMLWidgets.widget({
 
 					// Assume just segmentTracks.
 					// TODO: Add support for other kinds of data tracks later
-					tracks.push(segmentTrack(cm, d3data, visualizations[t.vis](t.vis_config), {
+					tracks.push(segmentTrack(cm, d3data, visualizations[t.vis.type](t.vis.config), {
 						title: t.title,
 						peeker: tp,
 						samples: ensureArray(t.samples),
