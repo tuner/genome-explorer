@@ -1,7 +1,7 @@
 /**
- * genome-explorer
+ * genome-spy
  *
- * Copyright © 2016 Kari Lavikka. All rights reserved.
+ * Copyright © 2016-2018 Kari Lavikka.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE.txt file in the root directory of this source tree.
@@ -60,7 +60,7 @@ function ensureArray(a) {
 
 HTMLWidgets.widget({
 
-	name: 'GenomeExplorer',
+	name: 'GenomeSpy',
 	type: 'output',
 
 	factory: function(el, width, height) {

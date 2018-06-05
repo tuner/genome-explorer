@@ -11,4 +11,4 @@ dependencies:
  - name: css
    version: 0.0
    src: htmlwidgets
-   stylesheet: GenomeExplorer.css
+   stylesheet: GenomeSpy.css

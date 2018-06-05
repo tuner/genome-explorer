@@ -1,6 +1,6 @@
-#' Creates a Genome Explorer
+#' Creates a Genome Spy
 #'
-#' Creates a Genome Explorer for the given genome assembly.
+#' Creates a Genome Spy for the given genome assembly.
 #' 
 #' @param genome Genome assembly to use. Valid values are hg19 and hg38. Instead of the
 #'   name of the assembly, a cytobands data frame can be provided instead. See \code{\link{readCytobands}}.
@@ -10,12 +10,12 @@
 #' @author Kari Lavikka, \email{kari.lavikka@@helsinki.fi}
 #' 
 #' @export
-GenomeExplorer <- function(genome, width = "100%", height = "auto", elementId = NULL) {
+GenomeSpy <- function(genome, width = "100%", height = "auto", elementId = NULL) {
   if (is.character(genome)) {
     if (grepl("hg[0-9]+", genome)) {
-      f <- system.file("extdata", paste0("cytoBand.", genome, ".txt"), package = "GenomeExplorer")
+      f <- system.file("extdata", paste0("cytoBand.", genome, ".txt"), package = "GenomeSpy")
       if (!file.exists(f)) {
-        stop("Cytoband data for the given genome assembly is not bundled with Genome Explorer. Please provide a cytoband data frame instead.")
+        stop("Cytoband data for the given genome assembly is not bundled with Genome Spy. Please provide a cytoband data frame instead.")
       }
       cytobands <- readCytobands(f)
       
@@ -38,11 +38,11 @@ GenomeExplorer <- function(genome, width = "100%", height = "auto", elementId = 
 
   # create widget
   htmlwidgets::createWidget(
-    name = 'GenomeExplorer',
+    name = 'GenomeSpy',
     x,
     width = width,
     height = height,
-    package = 'GenomeExplorer',
+    package = 'GenomeSpy',
     elementId = elementId
   )
 }
@@ -50,8 +50,8 @@ GenomeExplorer <- function(genome, width = "100%", height = "auto", elementId = 
 #' Reads a cytobands file into a data frame
 #'
 #' This function can be used to load a cytoband file for a genome assembly
-#' that is not supported out of the box by the GenomeExplorer. A loaded
-#' data frame can be fed to GenomeExplorer instead of a name of a genome assembly.
+#' that is not supported out of the box by the GenomeSpy. A loaded
+#' data frame can be fed to GenomeSpy instead of a name of a genome assembly.
 #' 
 #' An example of a cytoband file:
 #' http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz
@@ -69,7 +69,7 @@ readCytobands <- function(file) {
   )
 }
 
-#' Adds a segment track to Genome Explorer
+#' Adds a segment track to Genome Spy
 #' 
 #' A segment is a region in a chromosome. It has start and end coordinates, which are
 #' indexed in UCSC style 1-indexed closed ranges.
@@ -77,7 +77,7 @@ readCytobands <- function(file) {
 #' A segment track uses a user-defined method for visualizing arbitrary columns
 #' in the data. Currently supported methods are \code{\link{simpleVis}} and \code{\link{cnvVis}}.
 #' 
-#' @param ge A GenomeExplorer instance.
+#' @param ge A GenomeSpy instance.
 #' @param data A data frame that contains the segments being visualized.
 #' @param discriminator An optional discriminator column that is used for
 #'   spreading the data (cases) to subtracks.
@@ -94,7 +94,7 @@ readCytobands <- function(file) {
 #' @param subtrackSize Subtrack thickness (height) in pixels.
 #' @param subtrackPadding Padding between the subtracks in proportion to thickness.
 #' 
-#' @return The same GenomeExplorer instance that was passed in
+#' @return The same GenomeSpy instance that was passed in
 #' 
 #' @examples
 #' segmentTrack(
@@ -210,7 +210,7 @@ cnvVis <- function(seg = NULL, baf = NULL) {
   )
 }
 
-#' Adds a refseq gene annotation track to Genome Explorer
+#' Adds a refseq gene annotation track to Genome Spy
 #'
 #' @param refseq_genes_compressed A URL to "delta compressed" refseq genes. See utils/compressRefGene.py
 #' 
@@ -227,7 +227,7 @@ refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
     url <- refseq_genes_compressed
     
   } else if (is.character(ge$x$genome)) {
-    url = paste0("https://karilavikka.fi/genome-explorer/annotations/refSeq_genes.", ge$x$genome, ".compressed.txt")
+    url = paste0("https://karilavikka.fi/genome-spy/annotations/refSeq_genes.", ge$x$genome, ".compressed.txt")
     
   } else {
     stop("No genome assembly nor a URL to annotation data has been provided!")
@@ -244,9 +244,9 @@ refseqGeneTrack <- function(ge, refseq_genes_compressed = NULL) {
 #' the user interface.
 #' 
 #' Gene search is only available if gene annotation track has been added to the
-#' explorer.
+#' Spy.
 #' 
-#' @param ge A GenomeExplorer instance
+#' @param ge A GenomeSpy instance
 #' @param search The search keyword
 #' 
 #' @examples
@@ -263,7 +263,7 @@ search <- function(ge, search) {
 
 #' Zooms into the specified region
 #' 
-#' @param ge A GenomeExplorer instance
+#' @param ge A GenomeSpy instance
 #' @param startChrom,endChrom A chromosome
 #' @param startPos,endPos A position within the chromosome
 #' 
@@ -278,41 +278,41 @@ zoom <- function(ge, startChrom, startPos, endChrom, endPos) {
   ge
 }
   
-#' Shiny bindings for GenomeExplorer
+#' Shiny bindings for GenomeSpy
 #'
-#' Output and render functions for using GenomeExplorer within Shiny
+#' Output and render functions for using GenomeSpy within Shiny
 #' applications and interactive Rmd documents.
 #'
 #' @param outputId output variable to read from
 #' @param width,height Must be a valid CSS unit (like \code{'100\%'},
 #'   \code{'400px'}, \code{'auto'}) or a number, which will be coerced to a
 #'   string and have \code{'px'} appended.
-#' @param expr An expression that generates a GenomeExplorer
+#' @param expr An expression that generates a GenomeSpy
 #' @param env The environment in which to evaluate \code{expr}.
 #' @param quoted Is \code{expr} a quoted expression (with \code{quote()})? This
 #'   is useful if you want to save an expression in a variable.
 #'
-#' @name GenomeExplorer-shiny
+#' @name GenomeSpy-shiny
 #'
 #' @export
-GenomeExplorerOutput <- function(outputId, width = '100%', height = 'auto'){
-  htmlwidgets::shinyWidgetOutput(outputId, 'GenomeExplorer', width, height, package = 'GenomeExplorer')
+GenomeSpyOutput <- function(outputId, width = '100%', height = 'auto'){
+  htmlwidgets::shinyWidgetOutput(outputId, 'GenomeSpy', width, height, package = 'GenomeSpy')
 }
 
-#' @rdname GenomeExplorer-shiny
+#' @rdname GenomeSpy-shiny
 #' @export
-renderGenomeExplorer <- function(expr, env = parent.frame(), quoted = FALSE) {
+renderGenomeSpy <- function(expr, env = parent.frame(), quoted = FALSE) {
   if (!quoted) { expr <- substitute(expr) } # force quoted
-  htmlwidgets::shinyRenderWidget(expr, GenomeExplorerOutput, env, quoted = TRUE)
+  htmlwidgets::shinyRenderWidget(expr, GenomeSpyOutput, env, quoted = TRUE)
 }
 
 .onLoad <- function(libname, pkgname) {
-  shiny::registerInputHandler("GenomeExplorerRange", function(data, ...) {
+  shiny::registerInputHandler("GenomeSpyRange", function(data, ...) {
     #jsonlite::fromJSON(jsonlite::toJSON(data, auto_unbox = TRUE))
     data
   }, force = TRUE)
 }
 
 .onUnload <- function(libname) {
-  shiny::removeInputHandler("GenomeExplorerRange")
+  shiny::removeInputHandler("GenomeSpyRange")
 }

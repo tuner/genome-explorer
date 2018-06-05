@@ -9,8 +9,8 @@ import globals from "rollup-plugin-node-globals"
 export default {
 //		entry: 'src/scripts/main.js',
 //		dest: 'build/js/main.min.js',
-		entry: 'src/GenomeExplorer.js',
-		dest: '../inst/htmlwidgets/GenomeExplorer.js',
+		entry: 'src/GenomeSpy.js',
+		dest: '../inst/htmlwidgets/GenomeSpy.js',
 		format: 'iife',
 		sourceMap: true,
 		sourceMapFile: 'build/js/main.js.map',
