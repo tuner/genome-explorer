@@ -1,10 +1,10 @@
-# Genome Explorer
+# Genome Spy
 
-Genome Explorer is an R package for interactive visualization of processed genomic data.
+Genome Spy is an R package for interactive visualization of processed genomic data.
 
 ## Documentation
 
-For a more comprehensive documentation please navigate to: https://tuner.github.io/genome-explorer/
+For a more comprehensive documentation please navigate to: https://tuner.github.io/genome-spy/
 
 ## Compilation
 
@@ -15,4 +15,4 @@ want to tinker with the source code, nodejs and rollup are needed.
 2. $ npm init
 3. $ rollup -c
 
-Rollup creates a bundled javascript file and places it in inst/extdata/htmlwidgets/GenomeExplorer.js
+Rollup creates a bundled javascript file and places it in inst/extdata/htmlwidgets/GenomeSpy.js
