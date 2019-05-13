@@ -1,6 +1,6 @@
 This project is no longer developed. See: https://github.com/tuner/genome-spy
 
-# Genome Spy
+# Genome Spy (Legacy version)
 
 Genome Spy is an R package for interactive visualization of processed genomic data.
 
